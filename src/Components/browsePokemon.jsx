@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
 function BrowsePokemon() {
-    const [pokemonNames, setPokemonNames] = useState([]); // Holds Pokémon names for the current page
-    const [images, setImages] = useState([]); // Holds Pokémon images for the current page
+    const [pokemonNames, setPokemonNames] = useState([]); // Holds all Pokémon names
+    const [images, setImages] = useState([]); // Holds all Pokémon images
     const [page, setPage] = useState(1); // Current page
     const [selectedPokemon, setSelectedPokemon] = useState();
     const [isLoading, setIsLoading] = useState(true); // Loading state
@@ -11,42 +11,47 @@ function BrowsePokemon() {
         setSelectedPokemon(pokemon);
     };
 
-    // Function to fetch Pokémon data for the current page
-    const fetchPokemonsForPage = async (page) => {
-        setIsLoading(true); // Set loading state to true before starting the fetch
-        const pageSize = 25;
-        const startIndex = (page - 1) * pageSize + 1; // Start index of the current page
-        const endIndex = startIndex + pageSize - 1; // End index of the current page
-        const allImages = [];
-        const allNames = [];
-
-        // Fetch data for the current page
-        for (let i = startIndex; i <= endIndex; i++) {
-            const pokemonCharacter = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`);
-            const pokemonData = await pokemonCharacter.json();
-
-            allImages.push(pokemonData.sprites.front_default); // Store image URL
-            allNames.push(pokemonData.name); // Store name
-        }
-
-        setImages(allImages); // Save images for the current page
-        setPokemonNames(allNames); // Save names for the current page
-        setIsLoading(false); // Set loading state to false when fetch is complete
-    };
-
-    // Fetch Pokémon data whenever the page changes
+    // Fetch Pokémon data only once
     useEffect(() => {
-        fetchPokemonsForPage(page);
-    }, [page]);
+        const fetchPokemons = async () => {
+            setIsLoading(true); // Set loading state to true before starting the fetch
+            const allImages = [];
+            const allNames = [];
+            for (let i = 1; i <= 400; i++) {
+                const pokemonCharacter = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`);
+                const pokemonData = await pokemonCharacter.json();
+
+                allImages.push(pokemonData.sprites.front_default); // Store image URL
+                allNames.push(pokemonData.name); // Store name
+            }
+
+            setImages(allImages); // Save all images
+            setPokemonNames(allNames); // Save all names
+            setIsLoading(false); // Set loading state to false when fetch is complete
+        };
+
+        fetchPokemons();
+    }, []);
+
+    // Function to calculate the subset of Pokémon to display based on the page
+    const pageSize = 25; // 5x5 grid = 25 Pokémon per page
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const currentImages = images.slice(startIndex, endIndex);
+    const currentNames = pokemonNames.slice(startIndex, endIndex);
 
     // Handle Next button click (increment the page)
     const handleNext = () => {
-        setPage(prevPage => prevPage + 1);
+        if (endIndex < images.length) {
+            setPage(prevPage => prevPage + 1);
+        }
     };
 
     // Handle Previous button click (decrement the page)
     const handlePrevious = () => {
-        setPage(prevPage => prevPage - 1);
+        if (page > 1) {
+            setPage(prevPage => prevPage - 1);
+        }
     };
 
     return (
@@ -63,17 +68,17 @@ function BrowsePokemon() {
             ) : (
                 <>
                     <div className="card-container">
-                        {images.map((image, index) => {
-                            const isSelected = selectedPokemon === pokemonNames[index];
+                        {currentImages.map((image, index) => {
+                            const isSelected = selectedPokemon === currentNames[index];
                             return (
                                 <div
-                                    key={index}
-                                    id={`pokemon-${index}`}
+                                    key={startIndex + index}
+                                    id={`pokemon-${startIndex + index}`}
                                     className={`card ${isSelected ? 'selected-pokemon' : ''}`} // Add 'selected-pokemon' class if selected
-                                    onClick={() => selected(pokemonNames[index])} // Set the clicked Pokémon
+                                    onClick={() => selected(currentNames[index])} // Set the clicked Pokémon
                                 >
-                                    <img src={image} alt={pokemonNames[index]} className="w-full h-auto" />
-                                    <p>{pokemonNames[index]}</p>
+                                    <img src={image} alt={currentNames[index]} className="w-full h-auto" />
+                                    <p>{currentNames[index]}</p>
                                 </div>
                             );
                         })}
@@ -86,9 +91,11 @@ function BrowsePokemon() {
                                 Previous
                             </button>
                         )}
-                        <button onClick={handleNext} className='nextAndPrevious'>
-                            Next
-                        </button>
+                        {endIndex < images.length && (
+                            <button onClick={handleNext} className='nextAndPrevious'>
+                                Next
+                            </button>
+                        )}
                     </div>
                 </>
             )}
