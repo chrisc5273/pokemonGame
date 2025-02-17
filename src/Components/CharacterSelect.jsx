@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function CharacterSelect({ pokemonImages, pokemonNames, onFight, onBrowse }) {
+function CharacterSelect({ onFight, onBrowse }) {
   const [pokemonSelected, setPokemonSelected] = useState('none');
 
   // Function to handle selecting a Pokémon

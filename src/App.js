@@ -1,52 +1,15 @@
-import React, { useState, useEffect } from 'react';
-
+import React, { useState } from 'react';
 import './App.css';
 import HomeScreen from './Components/HomeScreen';
 import CharacterSelect from './Components/CharacterSelect';
 import FightScreen from './Components/FightScreen';
 import WinningScreen from './Components/WinningScreen';
-import BrowsePokemon from './Components/browsePokemon'
+import BrowsePokemon from './Components/browsePokemon';
+import Card from './Components/card';
+
 function App() {
-  const [pokemonImages, setPokemonImages] = useState([]);
-  const [pokemonNames, setPokemonNames] = useState([]);
   const [currentScreen, setCurrentScreen] = useState('HomeScreen');
   const [selectedPokemon, setSelectedPokemon] = useState({ name: '', image: '' });
-  const [berries, setBerries] = useState([]);
-  const [randomPokemon, setRandomPokemon] = useState();
-  // Function to fetch Pokémon data and update state
-  useEffect(() => {
-    const fetchPokemon = async () => {
-      const images = [];
-      const names = [];
-      let pokemonData;
-      for (let i = 0; i < 20; i++) {
-        const randomNum = Math.floor(Math.random() * 800 + 1);
-        setRandomPokemon(randomNum);
-        const pokemonCharacter = await fetch(`https://pokeapi.co/api/v2/pokemon/${randomNum}`);
-        pokemonData = await pokemonCharacter.json();
-
-        if (!names.includes(pokemonData.name)) {
-          images.push(pokemonData.sprites.front_default);
-          names.push(pokemonData.name);
-        } else {
-          i--;
-        }
-      }
-      console.log(pokemonData);
-      setPokemonImages(images);
-      setPokemonNames(names);
-    };
-    fetchPokemon();
-  }, []);
-
-  useEffect(() => {
-    const fetchBerries = async () => {
-      const characterBerries = await fetch(`https://pokeapi.co/api/v2/berry/${randomPokemon}/`);
-      const berryData = await characterBerries.json();
-      console.log(berryData);
-    }
-    fetchBerries();
-  }, );
 
   // Handler to store the selected Pokémon and start the fight
   const startFight = (selectedPokemon) => {
@@ -58,12 +21,16 @@ function App() {
   const finishFight = () => {
     setCurrentScreen('winningScreen');
   };
-  const browsePokemonPage = () =>{
+
+  // Change screen to browse Pokémon
+  const browsePokemonPage = () => {
+    setSelectedPokemon({ name: '', image: '' }); // Reset the selected Pokémon when going back to browse
     setCurrentScreen('browsePokemon');
   };
+
   // Handler to restart the game and go back to CharacterSelect
   const restartGame = () => {
-    setSelectedPokemon({ name: '', image: '' }); // Reset the selected Pokémon
+    setSelectedPokemon({ name: '', image: '' });
     setCurrentScreen('characterSelect');
   };
 
@@ -71,24 +38,27 @@ function App() {
     setCurrentScreen('characterSelect');
   };
 
+  // This is where we handle selecting a Pokémon and showing the Card component
+  const descriptiveCard = (pokemon) => {
+    setSelectedPokemon(pokemon); // Set the selected Pokémon
+    setCurrentScreen('card'); // Change the screen to show the Card component
+  };
 
   return (
     <div className="app-container">
-      {currentScreen === 'HomeScreen'
-        ? <HomeScreen onStart={characterSelection} />
-        : currentScreen === 'characterSelect'
-        ? <CharacterSelect
-            pokemonImages={pokemonImages}
-            pokemonNames={pokemonNames}
-            onFight={startFight}
-            onBrowse={browsePokemonPage} // Pass startFight as a callback
-          />
-        : currentScreen === 'browsePokemon'
-        ? <BrowsePokemon/>
-        : currentScreen === 'fightScreen'
-        ? <FightScreen selectedPokemon={selectedPokemon} onWin={finishFight} /> // Pass selected Pokémon
-        : <WinningScreen selectedPokemon={selectedPokemon} onRestart={restartGame} /> // Pass selected Pokémon to WinningScreen
-      }
+      {currentScreen === 'HomeScreen' ? (
+        <HomeScreen onStart={characterSelection} />
+      ) : currentScreen === 'characterSelect' ? (
+        <CharacterSelect onFight={startFight} onBrowse={browsePokemonPage} />
+      ) : currentScreen === 'browsePokemon' ? (
+        <BrowsePokemon onCardClick={descriptiveCard} />
+      ) : currentScreen === 'card' ? (
+        <Card selectedPokemon={selectedPokemon} onBrowse={browsePokemonPage} /> 
+      ) : currentScreen === 'fightScreen' ? (
+        <FightScreen selectedPokemon={selectedPokemon} onWin={finishFight} />
+      ) : currentScreen === 'winningScreen' ? (
+        <WinningScreen selectedPokemon={selectedPokemon} onRestart={restartGame} />
+      ) : null}
     </div>
   );
 }
