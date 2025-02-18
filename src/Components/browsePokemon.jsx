@@ -1,56 +1,99 @@
 import React, { useState, useEffect } from 'react';
 
-function BrowsePokemon({ onCardClick }) {
-  const [pokemonNames, setPokemonNames] = useState([]);
-  const [images, setImages] = useState([]);
-  const [page, setPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(true);
+function BrowsePokemon({onCardClick}) {
+  const [pokemonNames, setPokemonNames] = useState([]); // Holds Pokémon names
+  const [images, setImages] = useState([]); // Holds Pokémon images
+  const [page, setPage] = useState(1); // Current page
+  const [selectedPokemon, setSelectedPokemon] = useState(null); // Selected Pokémon
+  const [isLoading, setIsLoading] = useState(true); // Loading state
 
+  const pageSize = 25; // 25 Pokémon per page
+  const startIndex = (page - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+
+  // Handle Pokémon selection
+  const selected = (pokemon) => {
+    setSelectedPokemon(pokemon);
+  };
+
+  // Fetch Pokémon data
   useEffect(() => {
     const fetchPokemons = async () => {
       setIsLoading(true);
-      const newImages = [];
-      const newNames = [];
+      const allImages = [];
+      const allNames = [];
 
-      for (let i = 1; i <= 25; i++) {
+      for (let i = 1; i <= 400; i++) {
         try {
           const pokemonCharacter = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`);
           const pokemonData = await pokemonCharacter.json();
-
-          newImages.push(pokemonData.sprites.front_default);
-          newNames.push(pokemonData.name);
+          allImages.push(pokemonData.sprites.front_default); // Store image URL
+          allNames.push(pokemonData.name); // Store name
         } catch (error) {
           console.error(`Error fetching Pokémon with index ${i}:`, error);
         }
       }
-
-      setImages(newImages);
-      setPokemonNames(newNames);
+      setImages(allImages); // Save images
+      setPokemonNames(allNames); // Save names
       setIsLoading(false);
     };
 
     fetchPokemons();
-  }, [page]);
+  }, []);
+
+  // Handle Next button
+  const handleNext = () => {
+    if (endIndex < images.length) {
+      setPage(prevPage => prevPage + 1);
+    }
+  };
+
+  // Handle Previous button
+  const handlePrevious = () => {
+    if (page > 1) {
+      setPage(prevPage => prevPage - 1);
+    }
+  };
+
+  // Get current set of Pokémon based on page
+  const currentImages = images.slice(startIndex, endIndex);
+  const currentNames = pokemonNames.slice(startIndex, endIndex);
 
   return (
     <div>
       <h1>Browse Pokémon</h1>
-
       {isLoading ? (
         <div>Loading Pokémon...</div>
       ) : (
-        <div className="card-container">
-          {images.map((image, index) => (
-            <div
-              key={index}
-              className="card"
-              onClick={() => onCardClick({ name: pokemonNames[index], image: image })}
-            >
-              <img src={image} alt={pokemonNames[index]} />
-              <p>{pokemonNames[index]}</p>
-            </div>
-          ))}
-        </div>
+        <>
+          <div className="card-container">
+            {currentImages.map((image, index) => {
+             
+              return (
+                <div
+                  key={startIndex + index}
+                  className="card"
+                  onClick={() => onCardClick({name: pokemonNames[startIndex + index], image: image})}
+                >
+                  <img src={image} alt={currentNames[index]} />
+                  <p>{currentNames[index]}</p>
+                </div>
+              );
+            })}
+          </div>
+          <div className="flex justify-center mt-4">
+            {page > 1 && (
+              <button onClick={handlePrevious} className='nextAndPrevious'>
+                Previous
+              </button>
+            )}
+            {endIndex < images.length && (
+              <button onClick={handleNext} className='nextAndPrevious'>
+                Next
+              </button>
+            )}
+          </div>
+        </>
       )}
     </div>
   );

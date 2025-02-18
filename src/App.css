@@ -8,45 +8,93 @@
   align-items: center;
   flex-direction: column;
 }
-.pokemon-card{
-  padding: 20px;
+.pokemon-card > div {
+  font-size: 30px;
+
+ }
+ .pokemon-card {
+  padding: 10px;
   display: grid;
-  grid-template-columns: auto auto auto auto;
-  gap: 10px;
+  grid-template-columns: 1fr 2fr; /* Two columns: left for item1 and item2, right for item3 */
+  grid-template-rows: auto minmax(200px, 1fr) minmax(200px, 1fr); /* Adjust rows to fit content */
+  gap: 10px; /* Reduce gap size */
+  color: white;
   background: linear-gradient(rgb(255, 113, 42), rgb(255, 204, 50));
   border-radius: 10px;
-  width: 80rem;
-  height: 60rem;
+  width: 80rem; /* Keep width */
+  height: auto; /* Let height adjust dynamically */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
   font-style: oblique;
   font-weight: 900;
-
-}
-.pokemon-card > div {
- text-align: center;
- font-size: 30px;
- background-color: white;
 }
 
-.item1{
-  grid-row-start: 1;
-  grid-row-end: 2;
-  grid-column-start: 1;
-  grid-column-end: 2;
+.header {
+  grid-column: 1 / span 2; /* Span the entire width */
+  grid-row: 1; /* Place in the first row */
+  font-size: 48px;
+  height: 130px; /* Allow height to adjust */
+  font-weight: bolder;
+}
 
+.item1 {
+  grid-column: 1; /* Place in the first column */
+  grid-row: 2; /* Place in the second row */
+  width: auto; /* Responsive width */
+  height: auto; /* Dynamic height based on content */
+  background-size: cover;
+  background-position: center;
+  min-height: 300px; /* Set a minimum height to prevent shrinkage */
 }
-.item2{
-  grid-row-start: 2;
-  grid-row-end: 4;
 
+.item2 {
+  grid-column: 1; /* Place in the first column */
+  grid-row: 3; /* Place in the third row */
+  height: 450px;
+  text-align: left;
+  gap: 5px; /* Reduce gap size */
+  width: 600px; /* Responsive width */
 }
-.item3{
-  grid-row-start: 1;
-  grid-row-end: 4;
-  grid-column-start: 2;
-  grid-column-end: 5;
+
+.item2 p {
+  font-size: 18px; /* Slightly smaller text */
 }
+
+.item3 {
+  grid-column: 2; /* Place in the second column */
+  grid-row: 2 / span 2; /* Span the second and third rows */
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  
+  justify-content: flex-start; /* Align items at the top */
+  align-items: center;
+  padding: 20px;
+  overflow-y: auto; /* Add scrolling if the content overflows */
+  border-radius: 10px;
+  max-height: 100%; /* Allow it to adjust dynamically */
+}
+
+.item3 ul {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+  text-align: left;
+  width: 100%;
+}
+ul{
+  list-style: none;
+}
+.item3 li {
+  margin: 5px 0; /* Reduce space between abilities */
+  font-size: 18px;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+
+
+
+
 .start-button {
   padding: 20px 40px;
   font-size: 24px;
@@ -108,6 +156,20 @@
   position: relative;
   
 }
+
+.nextAndPrevious {
+  padding: 10px 20px;
+  margin: 0 10px;
+  background-color: #000000;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  color:white;
+}
+
+.nextAndPrevious:hover {
+  background-color: #ffd83d;
+}
 .card:hover{
   transform: scale(1.1);
   background: linear-gradient(rgb(255, 113, 42), rgb(255, 191, 0));
@@ -126,22 +188,7 @@
 .fight-screen{
   display: grid;
 }
-.nextAndPrevious {
-  padding:10px 10px;
-  width: 150px;
-  border-color: #FFD700; /* Replace $yellow with the color value */
-  color: #0c0b0b;
-  font-size: 20px;
-  background-image: linear-gradient(45deg, #FFD700 50%, transparent 50%);
-  background-position: 100%;
-  background-size: 400%;
-  transition: background 300ms ease-in-out;
-  border-radius: 15px;
-}
 
-.nextAndPrevious:hover {
-  background-position: 0;
-}
 
 
 .loading-screen {
