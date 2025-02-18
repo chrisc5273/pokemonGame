@@ -5,7 +5,7 @@ import CharacterSelect from './Components/CharacterSelect';
 import FightScreen from './Components/FightScreen';
 import WinningScreen from './Components/WinningScreen';
 import BrowsePokemon from './Components/browsePokemon';
-import Card from './Components/card';
+import Card from './Components/Card';
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState('HomeScreen');

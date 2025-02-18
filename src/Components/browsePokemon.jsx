@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import Card from './Components/Card'; // Make sure Card is imported
 
-function BrowsePokemon({onCardClick}) {
+function BrowsePokemon() {
   const [pokemonNames, setPokemonNames] = useState([]); // Holds Pokémon names
   const [images, setImages] = useState([]); // Holds Pokémon images
   const [page, setPage] = useState(1); // Current page
@@ -10,11 +11,6 @@ function BrowsePokemon({onCardClick}) {
   const pageSize = 25; // 25 Pokémon per page
   const startIndex = (page - 1) * pageSize;
   const endIndex = startIndex + pageSize;
-
-  // Handle Pokémon selection
-  const selected = (pokemon) => {
-    setSelectedPokemon(pokemon);
-  };
 
   // Fetch Pokémon data
   useEffect(() => {
@@ -55,9 +51,24 @@ function BrowsePokemon({onCardClick}) {
     }
   };
 
+  // Handle Pokémon card click
+  const handleCardClick = (pokemon) => {
+    setSelectedPokemon(pokemon); // Set the selected Pokémon
+  };
+
+  // Handle going back to the browse page
+  const handleBrowse = () => {
+    setSelectedPokemon(null); // Deselect Pokémon
+  };
+
   // Get current set of Pokémon based on page
   const currentImages = images.slice(startIndex, endIndex);
   const currentNames = pokemonNames.slice(startIndex, endIndex);
+
+  // If a Pokémon is selected, show the Card component
+  if (selectedPokemon) {
+    return <Card selectedPokemon={selectedPokemon} onBrowse={handleBrowse} />;
+  }
 
   return (
     <div>
@@ -68,12 +79,16 @@ function BrowsePokemon({onCardClick}) {
         <>
           <div className="card-container">
             {currentImages.map((image, index) => {
-             
               return (
                 <div
                   key={startIndex + index}
                   className="card"
-                  onClick={() => onCardClick({name: pokemonNames[startIndex + index], image: image})}
+                  onClick={() =>
+                    handleCardClick({
+                      name: pokemonNames[startIndex + index],
+                      image: image
+                    })
+                  }
                 >
                   <img src={image} alt={currentNames[index]} />
                   <p>{currentNames[index]}</p>
